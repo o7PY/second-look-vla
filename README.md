@@ -24,5 +24,7 @@ Plain HTML, CSS and JavaScript, with no framework. The home page has a dark, tec
 
 ## What is in this repository
 
-- `web/`: the website itself, and the small tool that fills its numbers.
+- `index.html`, `part1.html` to `part4.html`, `assets/`: the website itself, meaning the home page, the four experiment pages, and their styles, scripts and data.
+- `.github/workflows/pages.yml`: the workflow that publishes the website with GitHub Pages.
+- `web/`: the small tool that fills the site's numbers from the study's results.
 - `src/`, `scripts/`, `tests/`: the Python code behind the study (the detector, the closed loop, the analyses and their tests).

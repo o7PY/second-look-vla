@@ -6,8 +6,8 @@
 <title>Part 1: the detector</title>
 <meta name="description" content="DeltaDINO compares a before and an after photo and says whether anything besides the robot arm moved.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%230B0B10%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%276%27 fill=%27none%27 stroke=%27%233B82F6%27 stroke-width=%273%27/%3E%3C/svg%3E">
-<link rel="stylesheet" href="css/part.css">
-<link rel="stylesheet" href="css/rail.css">
+<link rel="stylesheet" href="assets/css/part.css">
+<link rel="stylesheet" href="assets/css/rail.css">
 </head>
 <body data-page="part" data-part="1">
 <div class="rail"></div>
@@ -39,7 +39,7 @@
 
   <h2>Watch it work</h2>
   <p>This is a real before/after pair from the test set, with the numbers exported from the trained model. Step through it, or press Autoplay.</p>
-  <figure class="frame" style="margin:0"><iframe src="explainer/deltadino.html?model=C" title="Step-by-step walkthrough of DeltaDINO on one real image pair" loading="lazy"></iframe><figcaption>Model C is the one used in the closed loop. <a href="explainer/deltadino.html?model=C">Open it full screen</a>.</figcaption></figure>
+  <figure class="frame" style="margin:0"><iframe src="assets/explainer/deltadino.html?model=C" title="Step-by-step walkthrough of DeltaDINO on one real image pair" loading="lazy"></iframe><figcaption>Model C is the one used in the closed loop. <a href="assets/explainer/deltadino.html?model=C">Open it full screen</a>.</figcaption></figure>
 
   <h2>How well does it work?</h2>
   <p>It is very good where it was trained, and a little weaker on tasks it has never seen. On <span data-fact="sealed.eps">200</span> fresh SmolVLA episodes in simulation that were kept sealed until the end and scored once, model C reached an AUROC of <span data-fact="sealed.auroc_C">0.993</span> (mean of 3 training runs).</p>
@@ -47,6 +47,6 @@
 
   <nav class="nav" aria-label="Next"><a class="next" href="index.html#p1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Overview</a><a class="next" href="part2.html">Part 2: the closed loop<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></nav>
 </main>
-<script src="data/site-data.js"></script><script src="js/charts.js"></script><script src="js/rail.js"></script><script src="js/part.js"></script>
+<script src="assets/data/site-data.js"></script><script src="assets/js/charts.js"></script><script src="assets/js/rail.js"></script><script src="assets/js/part.js"></script>
 </body>
 </html>

@@ -1,0 +1,55 @@
+# Publishes the website to GitHub Pages with GitHub Actions.
+# Only the website files are uploaded (index.html, part1-4.html, assets/) plus the standalone study page (web-study/index.html, published at /study/ and linked from no page);
+# the Python code and everything else in the repository are not part of the site.
+# Jekyll is not used: the site is deployed as plain files, and an empty .nojekyll is shipped as well so Jekyll can never process it.
+# One-time setup: Settings > Pages > Build and deployment > Source: "GitHub Actions".
+name: Deploy site to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'part*.html'
+      - 'assets/**'
+      - '.nojekyll'
+      - 'web-study/index.html'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Assemble the site (website files only)
+        run: |
+          mkdir _site
+          cp index.html part1.html part2.html part3.html part4.html _site/
+          cp -r assets _site/assets
+          mkdir _site/study
+          cp web-study/index.html _site/study/index.html
+          touch _site/.nojekyll
+          find _site -type f | sort
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

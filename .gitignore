@@ -9,7 +9,21 @@
 !/src/
 !/scripts/
 !/tests/
+# the website at the root (published by GitHub Actions) and its workflow
+!/index.html
+!/part*.html
+!/assets/
+!/.nojekyll
+!/.github/
+/.github/*
+!/.github/workflows/
+/.github/workflows/*
 !/.github/workflows/pages.yml
+
+# the standalone study page: this one file only (published at /study/, linked from nowhere)
+!/web-study/
+/web-study/*
+!/web-study/index.html
 
 # src/, scripts/, tests/: Python files only (no data, notebooks, shell scripts or fixtures)
 /src/**
@@ -22,12 +36,15 @@
 !/tests/**/
 !/tests/**/*.py
 
-# web/: the site and the tool that fills it, but not local notes
+# web/: the tool that fills the site's numbers, but not local notes
 /web/README.txt
 
 # no markdown anywhere, except the one README at the top
 *.md
 !/README.md
+
+# build output of the workflow, never commit
+/_site/
 
 # never commit: context files, local agent settings, the R8 blind-review answers, secrets
 context/

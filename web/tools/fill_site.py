@@ -1,7 +1,7 @@
 """Fill every number on the site from the ledger (paper/numbers.json) or from web/tools/facts.json.
 
 HTML carries placeholders:  <span data-num="p2.H1" data-f="pp">x</span>   <span data-fact="dataset.pairs">x</span>
-Run:  python web/tools/fill_site.py          (rewrites the pages in web/public in place, writes web/public/data/site-data.js)
+Run:  python web/tools/fill_site.py          (rewrites the pages in place and writes assets/data/site-data.js)
       python web/tools/fill_site.py --check  (changes nothing; exits 1 if any page is out of date or an id is unknown)
 No number is typed by hand: ledger -> text, as in the paper. Facts that are not in the ledger carry a source in facts.json.
 """
@@ -10,8 +10,9 @@ from pathlib import Path
 
 TOOLS = Path(__file__).resolve().parent
 WEB = TOOLS.parent
-PUBLIC = WEB / "public"  # the folder that is deployed (GitHub Pages root); nothing outside it is published
 ROOT = WEB.parent
+# The website lives at the repository root (index.html, part1-4.html, assets/); that is what GitHub Pages publishes.
+TARGETS = [(ROOT, "assets/data/site-data.js")]
 rows = {r["id"]: r for r in json.load(open(ROOT / "paper/numbers.json"))["rows"]}
 facts = json.load(open(TOOLS / "facts.json"))
 MINUS = "−"
@@ -73,27 +74,31 @@ def process(text):
 
 def main(check):
     bad = 0
-    for p in sorted(PUBLIC.glob("*.html")):
-        old = p.read_text()
-        new = process(old)
-        if new != old:
-            if check:
-                print("out of date:", p.name); bad += 1
-            else:
-                p.write_text(new)
+    for folder, _ in TARGETS:
+        for p in sorted(folder.glob("*.html")):
+            old = p.read_text()
+            new = process(old)
+            if new != old:
+                if check:
+                    print("out of date:", p.relative_to(ROOT)); bad += 1
+                else:
+                    p.write_text(new)
     # chart data: the whole ledger as id -> [value, lo, hi], plus the facts
     EXCLUDE = {"p5.1a.p_perm_primary_approx"}  # superseded by the post hoc value p5.1.posthoc.p; no page uses it
     L = {i: [r["value"]] + (r["ci"] or []) for i, r in rows.items() if i not in EXCLUDE}
     F = {k: v["value"] for k, v in facts.items() if not k.startswith("_")}
     js = "/* generated file, do not edit */\nwindow.SITE=" + json.dumps({"L": L, "F": F}, separators=(",", ":")) + ";\n"
-    target = PUBLIC / "data/site-data.js"
-    if check:
-        if not target.exists() or target.read_text() != js:
-            print("out of date: data/site-data.js"); bad += 1
-    else:
-        target.write_text(js)
-    n = sum(len(re.findall(r'data-(?:num|fact)="', p.read_text())) for p in PUBLIC.glob("*.html"))
-    print(f"{'checked' if check else 'filled'} {n} numbers in {len(list(PUBLIC.glob('*.html')))} pages; {len(L)} ledger rows exported")
+    for folder, rel in TARGETS:
+        target = folder / rel
+        if check:
+            if not target.exists() or target.read_text() != js:
+                print("out of date:", target.relative_to(ROOT)); bad += 1
+        else:
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(js)
+    pages = [p for folder, _ in TARGETS for p in folder.glob("*.html")]
+    n = sum(len(re.findall(r'data-(?:num|fact)="', p.read_text())) for p in pages)
+    print(f"{'checked' if check else 'filled'} {n} numbers in {len(pages)} pages (the site); {len(L)} ledger rows exported")
     sys.exit(1 if bad else 0)
 
 
