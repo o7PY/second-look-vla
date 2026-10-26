@@ -1,0 +1,16 @@
+/* The side rail: four thin lines, no text. Shared by the home page and the part pages.
+   Resting: short, faint. Mouse near the left edge (or keyboard focus): all four lines grow and brighten.
+   The line of the current part is always the longest. */
+.rail{position:fixed;left:0;top:0;bottom:0;width:72px;z-index:60;display:flex;flex-direction:column;justify-content:center;
+  color:var(--rail,currentColor);transition:opacity .4s ease}
+.rail[data-hidden="true"]{opacity:0;pointer-events:none}
+.rail a,.rail button{all:unset;box-sizing:border-box;display:flex;align-items:center;height:44px;width:72px;padding-left:14px;cursor:pointer}
+.rail i{display:block;height:2px;width:8px;border-radius:2px;background:currentColor;opacity:.28;
+  transition:width .28s cubic-bezier(.2,.8,.2,1),opacity .28s ease,height .2s ease}
+.rail [aria-current="true"] i{width:20px;opacity:.75}
+.rail:hover i,.rail:focus-within i{width:26px;opacity:.7}
+.rail:hover [aria-current="true"] i,.rail:focus-within [aria-current="true"] i{width:46px;opacity:1;height:3px}
+.rail a:hover i,.rail button:hover i{opacity:1}
+.rail a:focus-visible,.rail button:focus-visible{outline:2px solid var(--acc,#3B82F6);outline-offset:-2px;border-radius:6px}
+@media (max-width:720px){.rail{width:44px}.rail a,.rail button{width:44px;padding-left:8px}}
+@media (prefers-reduced-motion:reduce){.rail,.rail i{transition:none}}

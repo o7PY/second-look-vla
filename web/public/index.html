@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Second Look</title>
+<meta name="description" content="Before a robot retries, it takes a second look: a camera check that decides whether to retry, carry on, or call a human. Pre-registered experiments in simulation.">
+<script>document.documentElement.classList.add("js")</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%230B0B10%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%276%27 fill=%27none%27 stroke=%27%233B82F6%27 stroke-width=%273%27/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/home.css">
+<link rel="stylesheet" href="css/rail.css">
+</head>
+<body data-page="home">
+<div class="rail" data-hidden="true"></div>
+
+<main>
+<!-- ============ INTRO ============ -->
+<section class="screen hero" id="hero">
+  <div class="wrap">
+    <p class="eyebrow">A study in robot recovery</p>
+    <h1>Second <span>Look</span></h1>
+    <p class="tag">Before a robot retries, it takes a second look.</p>
+    <p class="lead">When a robot&rsquo;s AI stumbles, should it simply try again?</p>
+  </div>
+</section>
+
+<section class="screen" id="aim">
+  <div class="wrap">
+    <p class="eyebrow rv">The Project</p>
+    <h2 class="rv d1">A robot that checks before it retries</h2>
+    <p class="rv d2">Robots driven by AI models (called <b>vision-language-action policies</b>, or VLAs) sometimes fail halfway through a job: they knock something over, drop it, or get stuck. The obvious fix is to try again. But if the failure moved something, trying again from a changed scene can make things worse.</p>
+    <p class="eyebrow rv" style="margin-top:38px">Our aim</p>
+    <div class="rv d1"><div class="q"><b>Can the robot notice that something is going wrong, early enough to act?</b><span class="mut">An alarm built from the policy&rsquo;s own behaviour.</span></div>
+    <div class="q"><b>Can it check what changed, using only a camera?</b><span class="mut">A detector called DeltaDINO compares a before and an after photo.</span></div>
+    <div class="q"><b>Can it then pick the right response?</b><span class="mut">Retry, carry on, or flag a human.</span></div></div>
+  </div>
+</section>
+
+<section class="screen" id="setup">
+  <div class="wrap">
+    <p class="eyebrow rv">Our setup</p>
+    <h2 class="rv d1">Alarm, pause, look, decide</h2>
+    <p class="rv d2">Click a step, or just watch. This loop is what every experiment builds on.</p>
+    <div class="loop rv d2" role="group" aria-label="The four steps of the loop">
+      <button class="step" aria-pressed="true"><b>Alarm</b><small>The policy&rsquo;s plan gets shaky.</small></button>
+      <button class="step" aria-pressed="false"><b>Pause</b><small>Freeze half a second, take a photo.</small></button>
+      <button class="step" aria-pressed="false"><b>Look</b><small>Compare before and now.</small></button>
+      <button class="step" aria-pressed="false"><b>Decide</b><small>Retry, or call a human.</small></button>
+    </div>
+    <p class="loop-note" id="loop-note" aria-live="polite"></p>
+    <div class="grid g3" style="margin-top:26px">
+      <div class="card rv"><h3>The robot&rsquo;s brain</h3><p class="mut" style="margin:0">SmolVLA, a small open-source policy that reads camera images and an instruction and outputs arm movements.</p></div>
+      <div class="card rv d1"><h3>The benchmark</h3><p class="mut" style="margin:0">LIBERO-Goal: one simulated tabletop scene with <span data-fact="bench.tasks">10</span> different goals. No real robot. A good fit because its demonstrations record the simulator&rsquo;s exact state at every step, so any moment can be restored and disturbed with a known true answer, and a SmolVLA policy for it already exists.</p></div>
+      <div class="card rv d2"><h3>The rule</h3><p class="mut" style="margin:0">One budget of <span data-fact="bench.budget">300</span> steps. Pauses and rewinds are paid out of it, so a retry always costs something.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="screen" id="data">
+  <div class="wrap">
+    <p class="eyebrow rv">The data we made</p>
+    <h2 class="rv d1">Teaching a detector what &ldquo;changed&rdquo; looks like</h2>
+    <p class="rv d2">We took <b><span data-fact="dataset.demos">500</span> recorded demonstrations</b> and scripted disturbances on top of them. For every one we saved a <i>before</i> photo and an <i>after</i> photo. The simulator knows every object&rsquo;s exact position, so it gave us the true answer, but it is only used as the label, never as input to the detector.</p>
+    <div class="grid g3 rv d2" style="margin:22px 0">
+      <div class="big"><span data-fact="dataset.pairs" data-count>60,565</span><small>labelled before/after pairs</small></div>
+      <div class="big"><span data-fact="dataset.policy_eps" data-count>200</span><small>SmolVLA episodes in simulation, turned into <span data-fact="dataset.policy_pairs">4,234</span> test pairs</small></div>
+      <div class="big"><span data-fact="sealed.eps" data-count>200</span><small>more SmolVLA episodes sealed away and scored only once</small></div>
+    </div>
+    <div class="grid g2" style="align-items:start;gap:28px">
+      <div class="rv">
+        <h3>Real changes</h3>
+        <div class="chips"><span class="chip">pushes</span><span class="chip">topples</span><span class="chip">drops</span><span class="chip">knocks</span><span class="chip">nudges</span></div>
+        <h3 style="margin-top:20px">Look-alikes that are <i>not</i> changes</h3>
+        <div class="chips"><span class="chip arm">only the arm moves</span><span class="chip arm">the arm blocks the view</span><span class="chip arm">nothing moves</span></div>
+        <p class="mut" style="margin-top:18px;font-size:15px">Two of the ten tasks (6 and 8) are never used for training, to test how well the detector copes with tasks it has not seen.</p>
+      </div>
+      <div class="demo rv d1" aria-labelledby="demo-h">
+        <h3 id="demo-h" style="font-size:16px">Try it: how the true label is decided</h3>
+        <label for="tr">Object moved <output id="tr-o">0.0 cm</output></label>
+        <input id="tr" type="range" min="0" max="2" step="0.1" value="0.3">
+        <label for="ro">Object rotated <output id="ro-o">0.0&deg;</output></label>
+        <input id="ro" type="range" min="0" max="10" step="0.5" value="1">
+        <div class="verdict" id="verdict" data-v="same" aria-live="polite"></div>
+        <p class="mut" style="font-size:13px;margin:10px 0 0">Changed: more than <span data-fact="thr.changed_cm">1.0</span> cm or <span data-fact="thr.changed_deg">5.0</span>&deg;. Unchanged: under <span data-fact="thr.same_cm">0.5</span> cm and <span data-fact="thr.same_deg">2.5</span>&deg;.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ THE PARTS ============ -->
+<div id="parts">
+
+<section class="screen part" id="p1">
+  <div class="wrap"><div class="grid2">
+    <div>
+      <div class="pno" aria-hidden="true">01</div>
+      <p class="eyebrow rv">Part 1 &middot; The detector</p>
+      <h2 class="rv d1">Can a camera tell what changed?</h2>
+      <div class="stats rv d2">
+        <div class="stat"><b><span data-fact="c.test_auroc" data-count>0.999</span></b><span class="lb">AUROC on the test set (model C, mean of 3 training runs). 1.0 is perfect, 0.5 is a coin flip</span></div>
+        <div class="stat"><b><span data-fact="c.big_recall" data-count>99.3%</span></b><span class="lb">of big changes caught (over <span data-fact="thr.big_cm">2</span> cm or <span data-fact="thr.big_deg">15</span>&deg;)</span></div>
+        <div class="stat"><b><span data-fact="c.h1h2_fa" data-count>0.08%</span></b><span class="lb">false alarms when only the arm moved, or the arm hid an object</span></div>
+      </div>
+      <p class="mut rv" style="font-size:13px;margin:-8px 0 22px">All three: model C, mean of 3 training runs.</p>
+      <a class="btn rv" href="part1.html">Explore Part 1 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+    <div class="viz rv d1"><div class="cmap" id="cmap" role="img" aria-label="Illustration of a change map: one hot patch where an object moved"></div><p class="cap">Illustration of a change map: DeltaDINO lights up the patches where it thinks something moved. Not a real output.</p></div>
+  </div></div>
+</section>
+
+<section class="screen part" id="p2">
+  <div class="wrap"><div class="grid2">
+    <div>
+      <div class="pno" aria-hidden="true">02</div>
+      <p class="eyebrow rv">Part 2 &middot; The closed loop</p>
+      <h2 class="rv d1">Does a second look make the robot succeed more?</h2>
+      <div class="stats rv d2">
+        <div class="stat"><b><span data-num="p2.seen.P3.SF" data-f="pct1" data-count>15.4%</span></b><span class="lb">of runs fail silently with Second Look, against <span data-num="p2.seen.P0.SF" data-f="pct1">32.1%</span> doing nothing</span></div>
+        <div class="stat"><b><span data-num="p2.H1" data-f="pp" data-count>−2.9 pp</span></b><span class="lb">change in success compared with doing nothing (<span data-num="p2.seen.P3.S" data-f="pct1">65.0%</span> against <span data-num="p2.seen.P0.S" data-f="pct1">67.9%</span>)</span></div>
+        <div class="stat"><b><span data-num="p2.cal.catch_rate" data-f="pct1" data-count>86.1%</span></b><span class="lb">of failing runs caught by the alarm before time ran out (it also fires on <span data-num="p2.cal.false_alarm" data-f="pct1">9.1%</span> of runs that succeed anyway)</span></div>
+      </div>
+      <a class="btn rv" href="part2.html">Explore Part 2 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+    <div class="viz rv d1"><p class="cap" style="margin:0">Succeeded</p><div id="p2-s"></div><p class="cap" style="margin:8px 0 0">Failed without anyone knowing</p><div id="p2-sf"></div></div>
+  </div></div>
+</section>
+
+<section class="screen part" id="p3">
+  <div class="wrap"><div class="grid2">
+    <div>
+      <div class="pno" aria-hidden="true">03</div>
+      <p class="eyebrow rv">Part 3 &middot; Choosing when to retry</p>
+      <h2 class="rv d1">Can a model decide when a retry is worth it?</h2>
+      <div class="stats rv d2">
+        <div class="stat"><b><span data-num="p4.H1" data-f="pp" data-count>+2.1 pp</span></b><span class="lb">success over doing nothing</span></div>
+        <div class="stat"><b><span data-num="p4.SH.retry_rate" data-f="pct1" data-count>9.2%</span></b><span class="lb">of runs retried, against <span data-num="p4.P2r.retry_rate" data-f="pct1">34.8%</span> for always retrying</span></div>
+        <div class="stat"><b><span data-num="p4.SH.rescue" data-f="int" data-count>39</span> / <span data-num="p4.SH.harm" data-f="int" data-count>18</span></b><span class="lb">runs rescued / runs hurt, against <span data-num="p4.P2r.rescue" data-f="int">65</span> / <span data-num="p4.P2r.harm" data-f="int">42</span> for always retrying</span></div>
+      </div>
+      <a class="btn rv" href="part3.html">Explore Part 3 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+    <div class="viz rv d1"><p class="cap" style="margin:0">Succeeded</p><div id="p3-s"></div><p class="cap" style="margin:8px 0 0">How often it retries</p><div id="p3-r"></div></div>
+  </div></div>
+</section>
+
+<section class="screen part" id="p4">
+  <div class="wrap"><div class="grid2">
+    <div>
+      <div class="pno" aria-hidden="true">04</div>
+      <p class="eyebrow rv">Part 4 &middot; Steering the retry noise</p>
+      <h2 class="rv d1">One retry differs from another only by luck. Can we pick good luck?</h2>
+      <div class="stats rv d2">
+        <div class="stat"><b><span data-num="p5.0.gap" data-f="pp" data-count>+31.7 pp</span></b><span class="lb">best of <span data-fact="p5.draws">64</span> noise draws against one random retry (an upper bound)</span></div>
+        <div class="stat"><b><span data-num="p5.0.dist_zero" data-f="pct1" data-count>40.0%</span></b><span class="lb">of failures never recovered in any of the <span data-fact="p5.draws">64</span> draws</span></div>
+        <div class="stat"><b><span data-num="p5.1a.auc" data-f="auc" data-count>0.552</span></b><span class="lb">how well a critic ranks good draws above bad ones (0.5 is chance)</span></div>
+      </div>
+      <a class="btn rv" href="part4.html">Explore Part 4 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    </div>
+    <div class="viz rv d1"><p class="cap" style="margin:0">Share of failures rescued by the best of k draws</p><div id="p4-curve"></div></div>
+  </div></div>
+</section>
+
+</div>
+
+<!-- ============ CONCLUSION ============ -->
+<section class="screen tall found" id="found">
+  <div class="wrap">
+    <p class="eyebrow rv">What we found</p>
+    <h2 class="rv d1">Three questions, three honest answers</h2>
+    <div class="rv d2">
+      <div class="q"><b>Can the robot notice that something is going wrong, early enough to act?</b>
+        <span class="ans"><strong>Yes.</strong> The alarm caught <strong><span data-num="p2.cal.catch_rate" data-f="pct1">86.1%</span></strong> of failing runs before time ran out, and it fired in <strong><span data-num="p2.cal.false_alarm" data-f="pct1">9.1%</span></strong> of runs that succeeded anyway (the threshold aimed for 10%).</span></div>
+      <div class="q"><b>Can it check what changed, using only a camera?</b>
+        <span class="ans"><strong>Yes, and accurately.</strong> DeltaDINO&rsquo;s AUROC is <strong><span data-fact="c.test_auroc">0.999</span></strong> on its test set (model C) and <strong><span data-num="p2.gate.auroc_seen" data-f="auc">0.989</span></strong> inside the loop. But a change often just means the robot made progress, and the camera did not improve the retry decision: replacing it with the simulator&rsquo;s own truth gave the same success (<span data-num="p2.seen.P4.S" data-f="pct1">65.0%</span> either way), and the retry model did no better with the camera score.</span></div>
+      <div class="q"><b>Can it pick the right response?</b>
+        <span class="ans"><strong>Partly.</strong> Flagging roughly halves silent failures (<span data-num="p2.seen.P0.SF" data-f="pct1">32.1%</span> to <span data-num="p2.seen.P3.SF" data-f="pct1">15.4%</span>) but costs <span data-num="p2.H1" data-f="ppabs">2.9 pp</span> of success. Retrying once at the alarm helps a little: always retrying scored <span data-num="p4.P2r.S" data-f="pct1">70.8%</span> against <span data-num="p4.P0.S" data-f="pct1">68.5%</span> for doing nothing, and the learned chooser gained <span data-num="p4.H1" data-f="pp">+2.1 pp</span> (a pre-registered test). But the chooser was no better than simply always retrying (<span data-num="p4.H2" data-f="pp">−0.2 pp</span>). Good retry noise exists (the best of <span data-fact="p5.draws">64</span> draws would rescue <span data-num="p5.0.any64" data-f="pct1">60.0%</span> of failures against <span data-num="p5.0.mean_p" data-f="pct1">28.3%</span> for one retry, an upper bound), but nothing we tried could pick it in advance (AUROC <span data-num="p5.1a.auc" data-f="auc">0.552</span>).</span></div>
+    </div>
+  </div>
+</section>
+</main>
+
+
+<script src="data/site-data.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/rail.js"></script>
+<script src="js/home.js"></script>
+</body>
+</html>

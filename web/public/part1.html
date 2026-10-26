@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Part 1: the detector</title>
+<meta name="description" content="DeltaDINO compares a before and an after photo and says whether anything besides the robot arm moved.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%230B0B10%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%276%27 fill=%27none%27 stroke=%27%233B82F6%27 stroke-width=%273%27/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/part.css">
+<link rel="stylesheet" href="css/rail.css">
+</head>
+<body data-page="part" data-part="1">
+<div class="rail"></div>
+<main class="wrap">
+  <div class="top"><a class="back" href="index.html#p1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Second Look</a></div>
+  <header>
+    <p class="kicker">Part 1 &middot; The detector</p>
+    <h1>Can a camera tell what changed?</h1>
+    <p class="lead rv">After a robot fails, the first thing worth knowing is whether the failure moved anything. <b>DeltaDINO</b> is the tool we built to answer that from two photos: one from before the trouble and one from now.</p>
+  </header>
+
+  <p class="small" style="margin:0">The headline numbers, for model C (the version the closed loop uses): the mean of 3 training runs on the test set, each run with its own decision threshold</p>
+  <div class="stats">
+    <div class="stat"><b><span data-fact="c.test_auroc" data-count>0.999</span></b><span class="lb">AUROC on the test set. 1.0 is perfect, 0.5 is a coin flip.</span></div>
+    <div class="stat"><b><span data-fact="c.big_recall" data-count>99.3%</span></b><span class="lb">of big changes caught (over <span data-fact="thr.big_cm">2</span> cm or <span data-fact="thr.big_deg">15</span>&deg;)</span></div>
+    <div class="stat"><b><span data-fact="c.h1h2_fa" data-count>0.08%</span></b><span class="lb">false alarms on look-alikes: scenes where only the arm moved, or the arm hid an object</span></div>
+  </div>
+
+  <h2>What it does</h2>
+  <p>DeltaDINO is a <b>change detector</b>. It sees two photos at once and, for every small patch of the picture, asks whether something other than the robot arm moved there. It answers with a <span data-fact="model.map">16×16</span> map of where it thinks things changed, plus one overall yes or no.</p>
+  <div class="flow" role="list" aria-label="How DeltaDINO works">
+    <div class="n" role="listitem"><b>1 &middot; Two photos</b>Before the trouble, and now.</div><span class="a" aria-hidden="true">&rarr;</span>
+    <div class="n" role="listitem"><b>2 &middot; Shared encoder</b>One small pretrained vision model (DINOv2-small, tuned with LoRA) reads both.</div><span class="a" aria-hidden="true">&rarr;</span>
+    <div class="n" role="listitem"><b>3 &middot; Compare</b>For each patch: before, now, and how much they differ.</div><span class="a" aria-hidden="true">&rarr;</span>
+    <div class="n" role="listitem"><b>4 &middot; Decide</b>A small head scores every patch, then the whole image.</div>
+  </div>
+  <p class="small">The version used in the closed loop (&ldquo;model C&rdquo;) hides only <span data-fact="model.static_patches">81</span> background patches where a changed object never appears in training. It does <i>not</i> hide the robot arm. It has about <span data-fact="model.params">0.89 M</span> trainable parameters and runs in <span data-fact="model.speed">under 5 ms per pair (one pair at a time, bf16, on a laptop RTX 4070 GPU)</span>.</p>
+  <div class="callout blue"><b>Why this design.</b> We believe the pairing of a Siamese two-photo comparison with a gate that decides between retrying and calling a human is new, though we have not done a full literature check (related work was read at abstract level only).</div>
+
+  <h2>Watch it work</h2>
+  <p>This is a real before/after pair from the test set, with the numbers exported from the trained model. Step through it, or press Autoplay.</p>
+  <figure class="frame" style="margin:0"><iframe src="explainer/deltadino.html?model=C" title="Step-by-step walkthrough of DeltaDINO on one real image pair" loading="lazy"></iframe><figcaption>Model C is the one used in the closed loop. <a href="explainer/deltadino.html?model=C">Open it full screen</a>.</figcaption></figure>
+
+  <h2>How well does it work?</h2>
+  <p>It is very good where it was trained, and a little weaker on tasks it has never seen. On <span data-fact="sealed.eps">200</span> fresh SmolVLA episodes in simulation that were kept sealed until the end and scored once, model C reached an AUROC of <span data-fact="sealed.auroc_C">0.993</span> (mean of 3 training runs).</p>
+  <div class="chart"><p class="ttl">AUROC of model C in different situations (bars start at 0.5, a coin flip)</p><div id="auroc"></div></div>
+
+  <nav class="nav" aria-label="Next"><a class="next" href="index.html#p1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Overview</a><a class="next" href="part2.html">Part 2: the closed loop<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></nav>
+</main>
+<script src="data/site-data.js"></script><script src="js/charts.js"></script><script src="js/rail.js"></script><script src="js/part.js"></script>
+</body>
+</html>

@@ -1,0 +1,253 @@
+{
+  "_note": "Numbers that are NOT in paper/numbers.md (the ledger). Each has a source file in this repo. fmt: int = thousands separators, raw = as is.",
+  "dataset.demos": {
+    "value": 500,
+    "fmt": "int",
+    "source": "README.md, Part 1 (500 LIBERO-Goal demonstration episodes, 10 tasks x 50)"
+  },
+  "dataset.pairs": {
+    "value": 60565,
+    "fmt": "int",
+    "source": "README.md; docs/history/SUMMARY.md (P4 dataset)"
+  },
+  "dataset.changed": {
+    "value": 30000,
+    "fmt": "int",
+    "source": "docs/history/SUMMARY.md (P4 dataset: 30,000 unchanged / 30,000 changed / 565 gray)"
+  },
+  "dataset.gray": {
+    "value": 565,
+    "fmt": "int",
+    "source": "docs/history/SUMMARY.md (P4 dataset)"
+  },
+  "dataset.policy_eps": {
+    "value": 200,
+    "fmt": "int",
+    "source": "docs/history/SUMMARY.md (P9 policy set: 200 SmolVLA episodes)"
+  },
+  "dataset.policy_pairs": {
+    "value": 4234,
+    "fmt": "int",
+    "source": "docs/history/SUMMARY.md (P9 policy set: 4,234 pairs)"
+  },
+  "sealed.eps": {
+    "value": 200,
+    "fmt": "int",
+    "source": "docs/history/SUMMARY.md (R5 sealed set test_policy2)"
+  },
+  "sealed.pairs": {
+    "value": 4147,
+    "fmt": "int",
+    "source": "docs/history/SUMMARY.md (R5 sealed set test_policy2)"
+  },
+  "sealed.auroc_C": {
+    "value": "0.993",
+    "fmt": "raw",
+    "source": "context/outputs/reports/before_part2.md section 7: model C on test_policy2, mean of 3 seeds at the F1-max threshold"
+  },
+  "model.params": {
+    "value": "0.89 M",
+    "fmt": "raw",
+    "source": "README.md, Part 1 (0.89 M trainable parameters)"
+  },
+  "model.static_patches": {
+    "value": 81,
+    "fmt": "int",
+    "source": "README.md, Part 1 (model C masks 81 static patches)"
+  },
+  "bench.tasks": {
+    "value": 10,
+    "fmt": "int",
+    "source": "README.md (LIBERO-Goal, 10 tasks)"
+  },
+  "bench.budget": {
+    "value": 300,
+    "fmt": "int",
+    "source": "README.md, Method (one 300-step budget)"
+  },
+  "bench.pause_steps": {
+    "value": 10,
+    "fmt": "int",
+    "source": "README.md, Method (pause 10 steps = 0.5 s)"
+  },
+  "bench.rewind_steps": {
+    "value": 60,
+    "fmt": "int",
+    "source": "README.md, Method (rewind 6 decisions = 60 steps)"
+  },
+  "thr.changed_cm": {
+    "value": 1.0,
+    "fmt": "raw",
+    "source": "README.md, Part 1 (changed: translation > 1 cm or rotation > 5 deg)"
+  },
+  "thr.changed_deg": {
+    "value": 5.0,
+    "fmt": "raw",
+    "source": "README.md, Part 1"
+  },
+  "thr.same_cm": {
+    "value": 0.5,
+    "fmt": "raw",
+    "source": "README.md, Part 1 (unchanged: below 0.5 cm and 2.5 deg)"
+  },
+  "thr.same_deg": {
+    "value": 2.5,
+    "fmt": "raw",
+    "source": "README.md, Part 1"
+  },
+  "p2.test_eps": {
+    "value": 900,
+    "fmt": "int",
+    "source": "README.md (Part 2 TEST 900 episodes, 720 on seen tasks)"
+  },
+  "p2.test_seen": {
+    "value": 720,
+    "fmt": "int",
+    "source": "README.md"
+  },
+  "p4.test_eps": {
+    "value": 1000,
+    "fmt": "int",
+    "source": "README.md (Part 4 TEST 1000 episodes)"
+  },
+  "p4.gen_eps": {
+    "value": 600,
+    "fmt": "int",
+    "source": "docs/history/SUMMARY.md (Part 4 GEN: 600 episodes)"
+  },
+  "p4.gen_cases": {
+    "value": 218,
+    "fmt": "int",
+    "source": "README.md, Part 4 (218 branched alarm cases)"
+  },
+  "p5.states": {
+    "value": 40,
+    "fmt": "int",
+    "source": "README.md, Part 5 (40 alarmed failures)"
+  },
+  "p5.draws": {
+    "value": 64,
+    "fmt": "int",
+    "source": "README.md, Part 5 (64 noise draws)"
+  },
+  "p5.bar_auc": {
+    "value": 0.65,
+    "fmt": "raw",
+    "source": "paper/claims.md C7 (pre-registered GO bar: within-state AUROC 0.65)"
+  },
+  "p5.crit_sources": {
+    "value": "observation, noise and plan",
+    "fmt": "raw",
+    "source": "paper/claims.md C7"
+  },
+  "p4.branch_draws": {
+    "value": 4,
+    "fmt": "int",
+    "source": "README.md, Part 4 (4 retry and 4 continue draws per alarm case)"
+  },
+  "p5.clusters": {
+    "value": 35,
+    "fmt": "int",
+    "source": "README.md, Part 5 (40 states in 35 clusters)"
+  },
+  "thr.big_cm": {
+    "value": 2,
+    "fmt": "int",
+    "source": "docs/history/SUMMARY.md, Part 1 table (recall on >2 cm / >15 deg)"
+  },
+  "thr.big_deg": {
+    "value": 15,
+    "fmt": "int",
+    "source": "docs/history/SUMMARY.md, Part 1 table (recall on >2 cm / >15 deg)"
+  },
+  "model.map": {
+    "value": "16×16",
+    "fmt": "raw",
+    "source": "README.md, Part 1 (a 16x16 change map and an image logit)"
+  },
+  "model.speed": {
+    "value": "under 5 ms per pair (one pair at a time, bf16, on a laptop RTX 4070 GPU)",
+    "fmt": "raw",
+    "source": "context/outputs/reports/part1.md line 60 (4.9 ms per pair at batch 1, RTX 4070 Laptop, bf16); README.md (4.8 ms); docs/history/PART1_SPEC.md (4.8-4.9 ms)"
+  },
+  "p5.crit.block": {
+    "value": 8,
+    "fmt": "int",
+    "source": "results/part5/notes/p5_1_plan.txt, section 1 (features) and 2 (critic): block of 8 draws, best-of-8"
+  },
+  "p5.crit.state": {
+    "value": 28,
+    "fmt": "int",
+    "source": "results/part5/notes/p5_1_plan.txt, section 1 (features) and 2 (critic): F0 = the 28 Part 4 alarm features"
+  },
+  "p5.crit.plan": {
+    "value": "50×7 = 350",
+    "fmt": "raw",
+    "source": "results/part5/notes/p5_1_plan.txt, section 1 (features) and 2 (critic): F2 = the whole normalised chunk, 50 x 7 = 350"
+  },
+  "p5.crit.noise": {
+    "value": "50×32 = 1,600",
+    "fmt": "raw",
+    "source": "results/part5/notes/p5_1_plan.txt, section 1 (features) and 2 (critic): F1 = the flattened first-decision noise, 50 x 32 = 1600"
+  },
+  "p5.crit.folds": {
+    "value": "48 of 48",
+    "fmt": "raw",
+    "source": "results/part5/notes/p5_report.md section 8 (logistic F3+F1 chosen by the inner CV in 48 of 48 folds)"
+  },
+  "c.test_auroc": {
+    "value": 0.9987577234979431,
+    "fmt": "auc",
+    "source": "results/part1/b2/r6.json, candidate C (static mask only = model C), mean over seeds 0-2 of the test-split AUROC (corrected labels)"
+  },
+  "c.big_recall": {
+    "value": 0.9934594720859612,
+    "fmt": "pct1",
+    "source": "results/part1/b2/r6.json, candidate C (static mask only = model C), mean over seeds 0-2 of test.big_change_recall (>2 cm / >15 deg), each seed at its own val threshold"
+  },
+  "c.h1h2_fa": {
+    "value": 0.0007917656373713382,
+    "fmt": "pct2",
+    "source": "results/part1/b2/r6.json, candidate C (static mask only = model C), mean over seeds 0-2 of the false-alarm rate on hard negatives H1 (arm-only motion) + H2 (arm hides an object), test split"
+  },
+  "c.heldout_auroc": {
+    "value": 0.9955405447115874,
+    "fmt": "auc",
+    "source": "results/part1/b2/r6.json, candidate C (static mask only = model C), mean over seeds 0-2, held-out tasks 6 and 8"
+  },
+  "c.policy_auroc": {
+    "value": 0.9911492099328698,
+    "fmt": "auc",
+    "source": "results/part1/b2/r6.json, candidate C (static mask only = model C), mean over seeds 0-2, test_policy split (SmolVLA episodes in simulation)"
+  },
+  "p5.1b.n_flat": {
+    "value": 2,
+    "fmt": "int",
+    "source": "results/part5/critic/results.json firstnoise.per_state: states with good-first = bad-first (exactly zero effect); positive 6, negative 2, zero 2"
+  },
+  "p5.c_states": {
+    "value": 20,
+    "fmt": "int",
+    "source": "results/part5/notes/p5_1_plan.txt: the 20 C states (P0 succeeded)"
+  },
+  "p4.invalid_cm": {
+    "value": 1,
+    "fmt": "int",
+    "source": "src/second_look/snapshot.py MAX_PENETRATION = 0.01 m: a rewind that leaves a robot geom deeper than 1 cm inside another object is invalid"
+  },
+  "p5.fn_states": {
+    "value": 10,
+    "fmt": "int",
+    "source": "results/part5/notes/p5_1_plan.txt section 3: 10 mixed A states (0.1 <= p_s <= 0.9)"
+  },
+  "p5.fn_strong": {
+    "value": 20,
+    "fmt": "int",
+    "source": "results/part5/notes/p5_1_plan.txt section 4: effect >= 20 pp is STRONG"
+  },
+  "p5.fn_weak": {
+    "value": 10,
+    "fmt": "int",
+    "source": "results/part5/notes/p5_1_plan.txt section 4: effect < 10 pp is WEAK"
+  }
+}

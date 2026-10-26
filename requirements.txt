@@ -1,0 +1,22 @@
+# Pinned from the environment the results were produced in (env/pip-freeze.txt), limited to what the kept code imports.
+# lerobot (SmolVLA policy, LIBERO wrappers) is installed from its upstream git commit; it brings its own pinned dependencies.
+--extra-index-url https://download.pytorch.org/whl/cu128
+torch==2.11.0+cu128
+numpy==2.2.6
+pandas==2.3.3
+pyarrow==25.0.1
+scipy==1.18.1
+scikit-learn==1.9.1
+matplotlib==3.11.2
+PyYAML==6.0.3
+h5py==3.16.0
+opencv-python-headless==4.13.0.92
+pillow==12.3.0
+mujoco==3.8.1
+robosuite==1.4.0
+hf_libero==0.1.4
+bddl==1.0.1
+transformers==5.5.4
+peft==0.21.2
+pytest==9.1.1
+lerobot[smolvla,libero] @ git+https://github.com/huggingface/lerobot.git@93257e34685c68f6e2a0d63178d4d81ba13e8c1e

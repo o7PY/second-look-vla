@@ -1,0 +1,54 @@
+# This repository tracks ONLY the website and the Python code.
+# Everything is ignored by default; the allowlist below opts things in.
+/*
+!/.gitignore
+!/README.md
+!/pyproject.toml
+!/requirements.txt
+!/web/
+!/src/
+!/scripts/
+!/tests/
+
+# src/, scripts/, tests/: Python files only (no data, notebooks, shell scripts or fixtures)
+/src/**
+!/src/**/
+!/src/**/*.py
+/scripts/**
+!/scripts/**/
+!/scripts/**/*.py
+/tests/**
+!/tests/**/
+!/tests/**/*.py
+
+# web/: the site and the tool that fills it, but not local notes
+/web/README.txt
+
+# no markdown anywhere, except the one README at the top
+*.md
+!/README.md
+
+# never commit: context files, local agent settings, the R8 blind-review answers, secrets
+context/
+.claude/
+**/r8_key.csv
+**/c1_review.csv
+**/c1_rows/
+.env
+*.pem
+
+# caches, environments, editors
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+.venv/
+venv/
+node_modules/
+.hf_cache/
+.libero/
+.idea/
+.vscode/
+.DS_Store
+*.log

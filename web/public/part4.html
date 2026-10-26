@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Part 4: steering the retry noise</title>
+<meta name="description" content="The best of 64 noise draws would rescue far more failures than one random retry, but a simple critic could barely tell which draw is good.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%230B0B10%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%276%27 fill=%27none%27 stroke=%27%233B82F6%27 stroke-width=%273%27/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/part.css">
+<link rel="stylesheet" href="css/rail.css">
+</head>
+<body data-page="part" data-part="4">
+<div class="rail"></div>
+<main class="wrap">
+  <div class="top"><a class="back" href="index.html#p4"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Second Look</a></div>
+  <header>
+    <p class="kicker">Part 4 &middot; Steering the retry noise</p>
+    <h1>One retry differs from another only by luck. Can we pick good luck?</h1>
+    <p class="lead rv">Between two retries from the same moment, the only thing that differs is the random noise its policy starts from (every retry also pauses and rewinds the arm the same way). If some draws are much better than others, perhaps we can learn to choose them. We asked first whether that room exists, then whether anything available at retry time reveals it. No retraining or reinforcement learning was done.</p>
+  </header>
+
+  <div class="bar"><span class="small">The headline numbers, on <span data-fact="p5.states">40</span> failed situations</span><button class="sw" id="ci" aria-pressed="false">Show confidence intervals</button></div>
+  <div class="stats">
+    <div class="stat"><b><span data-num="p5.0.gap" data-f="pp" data-count>+31.7 pp</span></b><span class="lb">best of <span data-fact="p5.draws">64</span> draws against one random retry</span><span class="ci" data-num="p5.0.gap" data-f="pp" data-part="ci">[+21.2, +42.0]</span></div>
+    <div class="stat"><b><span data-num="p5.0.dist_zero" data-f="pct1" data-count>40.0%</span></b><span class="lb">of failures never recovered in any of the <span data-fact="p5.draws">64</span> draws</span></div>
+    <div class="stat"><b><span data-num="p5.1a.auc" data-f="auc" data-count>0.552</span></b><span class="lb">how well a critic ranks good draws above bad ones (0.5 is chance)</span><span class="ci" data-num="p5.1a.auc" data-f="auc" data-part="ci">[0.515, 0.592]</span></div>
+  </div>
+
+  <h2>Step 1: does the room exist?</h2>
+  <p>We took <span data-fact="p5.states">40</span> failed situations from SmolVLA runs in simulation and, for each, tried <span data-fact="p5.draws">64</span> different noise draws for the retry. Slide to see what an <b>all-seeing picker</b> would achieve if it could try that many draws and keep the best.</p>
+  <div class="chart">
+    <label for="k" class="small" style="display:block">Number of draws tried: <b id="k-o"></b></label>
+    <input type="range" id="k" min="0" max="6" step="1" value="0" aria-describedby="k-n">
+    <p class="big" style="margin:10px 0 2px"><span id="k-v"></span> <span class="small" style="font:400 15px var(--font)">of failures rescued</span></p>
+    <div class="dots" id="dots" role="img" aria-label="Forty dots, one per failed situation; filled dots are rescued"></div>
+    <p class="small" id="k-n" style="margin:0"></p>
+    <p class="small" style="margin:6px 0 0">Each dot is one failed situation. The dots show the share rescued, not which ones.</p>
+  </div>
+  <p style="margin-top:14px">One random retry rescues <b><span data-num="p5.0.mean_p" data-f="pct1">28.3%</span></b>. The best of <span data-fact="p5.draws">64</span> would rescue <b><span data-num="p5.0.any64" data-f="pct1">60.0%</span></b>, a gap of <b><span data-num="p5.0.gap" data-f="pp">+31.7 pp</span></b>. This was a pre-registered go/no-go test, and the answer is <b>go</b>: the room exists.</p>
+  <p class="small">Treat the best-of-<span data-fact="p5.draws">64</span> figure as an <b>upper bound</b>. It assumes a picker that already knows which draw will win, and taking the best of many draws inflates the result.</p>
+  <p class="small">The same test on the <span data-fact="p5.c_states">20</span> situations where the run would have succeeded anyway: one random retry succeeds only <span data-num="p5.0.C.mean_p" data-f="pct1">58.1%</span> of the time, so retrying every alarm puts runs that were fine at risk.</p>
+
+  <h2>Not every failure can be fixed</h2>
+  <div class="chart">
+    <div class="dots cls" id="classes" role="img" aria-label="Forty dots coloured by how easily each failed situation recovers"></div>
+    <div class="legend"><span><i style="background:var(--gray)"></i>never recovered (<span data-num="p5.0.dist_zero" data-f="pct1">40.0%</span>)</span><span><i style="background:var(--warm)"></i>sometimes (<span data-num="p5.0.dist_mid" data-f="pct1">27.5%</span>)</span><span><i style="background:var(--acc)"></i>usually (<span data-num="p5.0.dist_high" data-f="pct1">32.5%</span>)</span></div>
+  </div>
+  <p class="small" style="margin-top:10px">The grey ones look like habits of the policy: in all <span data-fact="p5.draws">64</span> draws it failed.</p>
+
+  <h2>Step 2: can anyone see the good draw?</h2>
+  <p>A perfect picker is not available, so we trained a <b>critic</b> that looks at <span data-fact="p5.crit_sources">observation, noise and plan</span> and tries to rank a situation&rsquo;s good draws above its bad ones. A score of 0.5 is chance. We had written down in advance that it needed <b><span data-fact="p5.bar_auc">0.65</span></b> to count as useful.</p>
+  <h3 style="margin-top:30px">What the critic is</h3>
+  <p>A critic scores each noise draw: how likely is a retry that starts from this noise to succeed? At retry time the robot would sample a handful of draws (we used <span data-fact="p5.crit.block">8</span>), score them all, and keep the best.</p>
+  <div class="flow" role="list" aria-label="How the critic works">
+    <div class="n" role="listitem"><b>1 &middot; The situation</b><span data-fact="p5.crit.state">28</span> numbers from the alarm: the task, alarm signals, gripper state and DeltaDINO&rsquo;s score.</div><span class="a" aria-hidden="true">+</span>
+    <div class="n" role="listitem"><b>2 &middot; The plan</b>What SmolVLA would do from this draw: its action chunk (<span data-fact="p5.crit.plan">50×7 = 350</span> numbers), plus summaries such as acceleration, how far the arm moves, and how different this plan is from the other draws.</div><span class="a" aria-hidden="true">+</span>
+    <div class="n" role="listitem"><b>3 &middot; The noise</b>The <span data-fact="p5.crit.noise">50×32 = 1,600</span> numbers the plan starts from, plus their overall size.</div><span class="a" aria-hidden="true">&rarr;</span>
+    <div class="n" role="listitem"><b>4 &middot; The scorer</b>A regularised logistic regression on standardised inputs. It outputs one score per draw.</div>
+  </div>
+  <p class="small">How to choose the scorer was fixed in advance: an inner cross-validation picked among three candidates (logistic regression on situation and plan, boosted trees on the same, and logistic regression on situation, plan and noise), and it chose logistic regression on situation, plan and noise in <span data-fact="p5.crit.folds">48 of 48</span> folds. That is the scorer evaluated below. It was always tested on data it had never seen: one task-and-starting-layout group was held out at a time.</p>
+  <h3 style="margin-top:26px">Where it comes from</h3>
+  <ul class="learn">
+    <li><b>The idea.</b> Steering a frozen policy by choosing its starting noise comes from DSRL (Wagenmaker et al., CoRL 2025), where a small learned actor picks the noise. We did not build that. We asked the cheaper question first: can a critic tell good noise from bad?</li>
+    <li><b>The model.</b> Our own design from standard tools: scikit-learn logistic regression and gradient-boosted trees. No neural network was trained.</li>
+    <li><b>The ingredients.</b> The situation features reuse the inputs of the retry selector from the previous part. The plan is SmolVLA&rsquo;s own output. The acceleration summary is the same score our alarm uses, ported from the open-source fm-geometry code (Apache-2.0).</li>
+    <li><b>Not tried.</b> A learned value head on the policy&rsquo;s own internal features, trained end to end.</li>
+  </ul>
+
+  <div class="chart"><div class="gauge" id="gauge"></div><p class="small" style="margin:0">The pale band is the 95% confidence interval for our critic.</p></div>
+  <p style="margin-top:14px">The critic scored <b><span data-num="p5.1a.auc" data-f="auc">0.552</span></b><span class="ci inl" data-num="p5.1a.auc" data-f="auc" data-part="ci">[0.515, 0.592]</span>. Picking its favourite of 8 draws gained only <b><span data-num="p5.1a.k8_gain" data-f="pp">+2.4 pp</span></b> over a random retry<span class="ci inl" data-num="p5.1a.k8_gain" data-f="pp" data-part="ci">[−0.5, +5.3]</span>. That is a <b>no-go</b>.</p>
+
+  <h2>What we learned</h2>
+  <ul class="learn">
+    <li><b>The room exists, but we could not find a way to see it.</b> A perfect noise picker would help a lot. A critic using the situation, the plan and the noise ranked draws only slightly better than chance (AUROC <span data-num="p5.1a.auc" data-f="auc">0.552</span> <span data-num="p5.1a.auc" data-f="auc" data-part="ci">[0.515, 0.592]</span>, an interval that excludes 0.5; a post hoc permutation test gives p = <span data-num="p5.1.posthoc.p" data-f="p">0.0100</span>), far too weak to pick better draws (<span data-num="p5.1a.k8_gain" data-f="pp">+2.4 pp</span> over a random retry, not significant).</li>
+    <li>So a noise-steering policy would have to discover the signal online, by trial, instead of reading it off the situation.</li>
+    <li><b>The first noise matters, unevenly.</b> Across <span data-fact="p5.fn_states">10</span> situations that sometimes succeed and sometimes fail, keeping the first noise from a draw that had succeeded (and resampling all later noise) raised success from <span data-num="p5.1b.bad" data-f="pct1">43.1%</span> to <span data-num="p5.1b.good" data-f="pct1">61.9%</span>: <span data-num="p5.1b.effect" data-f="pp">+18.8 pp</span> on average <span data-num="p5.1b.effect" data-f="pp" data-part="ci">[+3.1, +39.1]</span>. It was positive in <span data-num="p5.1b.n_pos" data-f="int">6</span> situations, negative in <span data-num="p5.1b.n_neg" data-f="int">2</span> and flat in <span data-fact="p5.1b.n_flat">2</span>. By the pre-registered rule (<span data-fact="p5.fn_strong">20</span> points or more is strong, under <span data-fact="p5.fn_weak">10</span> weak) this is a mixed result.</li>
+  </ul>
+  <nav class="nav" aria-label="Next"><a class="next" href="part3.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Part 3: choosing when to retry</a><a class="next" href="index.html">Back to the overview<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></nav>
+</main>
+<script src="data/site-data.js"></script><script src="js/charts.js"></script><script src="js/rail.js"></script><script src="js/part.js"></script>
+</body>
+</html>

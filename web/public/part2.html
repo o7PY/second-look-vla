@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Part 2: the closed loop</title>
+<meta name="description" content="Does pausing, looking and then retrying or flagging make a robot succeed more? Seven arms, 720 runs, pre-registered.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%230B0B10%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%276%27 fill=%27none%27 stroke=%27%233B82F6%27 stroke-width=%273%27/%3E%3C/svg%3E">
+<link rel="stylesheet" href="css/part.css">
+<link rel="stylesheet" href="css/rail.css">
+</head>
+<body data-page="part" data-part="2">
+<div class="rail"></div>
+<main class="wrap">
+  <div class="top"><a class="back" href="index.html#p2"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Second Look</a></div>
+  <header>
+    <p class="kicker">Part 2 &middot; The closed loop</p>
+    <h1>Does a second look make the robot succeed more?</h1>
+    <p class="lead rv">We put the whole loop together (alarm, pause, look, then retry or flag) and ran <span data-fact="p2.test_eps">900</span> episodes in simulation to find out, <span data-fact="p2.test_seen">720</span> of them on the eight tasks the system was tuned for. The questions and the analysis were written down before the test ran.</p>
+  </header>
+
+  <p class="small" style="margin:0">The headline numbers, on the eight seen tasks</p>
+  <div class="stats">
+    <div class="stat"><b><span data-num="p2.H1" data-f="pp" data-count>−2.9 pp</span></b><span class="lb">change in success compared with doing nothing (<span data-num="p2.seen.P3.S" data-f="pct1">65.0%</span> against <span data-num="p2.seen.P0.S" data-f="pct1">67.9%</span>)</span></div>
+    <div class="stat"><b><span data-num="p2.seen.P3.SF" data-f="pct1" data-count>15.4%</span></b><span class="lb">of runs fail <i>silently</i>, down from <span data-num="p2.seen.P0.SF" data-f="pct1">32.1%</span></span></div>
+    <div class="stat"><b><span data-num="p2.seen.P3.FP" data-f="pct1" data-count>80.1%</span></b><span class="lb">of flagged runs were ones the robot would have failed anyway</span></div>
+  </div>
+  <p class="small"><b>Silent failure</b> means the robot fails and nobody is told. Lowering it by flagging everything would be easy, so we always read it next to how <i>precise</i> the flags are.</p>
+
+  <h2>The alarm comes early enough</h2>
+  <p>Before any recovery, the alarm itself has to fire in time. On calibration runs it caught <b><span data-num="p2.cal.catch_rate" data-f="pct1">86.1%</span></b> of the failing episodes before time ran out. The price is false alarms: on runs that went on to succeed anyway, the alarm still fired in <b><span data-num="p2.cal.false_alarm" data-f="pct1">9.1%</span></b> (the threshold aimed for 10%, and was set on these same runs). The first alarm came at about step <span data-num="p2.cal.first_alarm_step" data-f="int">105</span>, with a median of <span data-num="p2.cal.lead_budget" data-f="int">195</span> of the <span data-fact="bench.budget">300</span> steps still left to act.</p>
+
+  <h2>Try it: compare the seven arms</h2>
+  <p>An <b>arm</b> is one way of handling alarms. Switch what is measured, and click an arm to see what it did.</p>
+  <div class="bar"><div class="seg" id="metric" role="group" aria-label="What to measure"><button data-k="S" aria-pressed="true">Success</button><button data-k="SF" aria-pressed="false">Silent failures</button><button data-k="F" aria-pressed="false">Flagged</button></div></div>
+  <div class="chart"><p class="ttl" id="arms-ttl"></p><div id="arms"></div></div>
+  <div class="info" id="arm-info" aria-live="polite"></div>
+
+  <h2>The three pre-registered tests</h2>
+  <table class="tbl"><thead><tr><th>Question</th><th>Result</th><th>Verdict</th></tr></thead><tbody>
+    <tr><td><b>H1</b> Does Second Look beat doing nothing on success?</td><td><span data-num="p2.H1" data-f="pp">−2.9 pp</span></td><td><span class="pill no">not supported</span></td></tr>
+    <tr><td><b>H2</b> Fewer silent failures than blind retry, without losing success?</td><td>silent failures <span data-num="p2.H2.SF" data-f="pp">−14.2 pp</span>, but success <span data-num="p2.H2.S" data-f="pp">−3.8 pp</span></td><td><span class="pill no">not supported</span></td></tr>
+    <tr><td><b>H3</b> Does it beat alarms raised at random moments?</td><td><span data-num="p2.H3" data-f="pp">+11.0 pp</span></td><td><span class="pill yes">supported</span></td></tr>
+  </tbody></table>
+  <p class="small">The random-timing arm is itself harmful, so H3 shows the alarm times the check better than chance. It does not show that Second Look beats doing nothing.</p>
+
+  <h2>Why it did not help</h2>
+  <p>Two findings explain it. First, the camera is not the problem: when the simulator&rsquo;s own truth replaced the camera (the oracle arm), the result was the same (<span data-num="p2.seen.P4.S" data-f="pct1">65.0%</span> against <span data-num="p2.seen.P3.S" data-f="pct1">65.0%</span>). Second, &ldquo;something changed&rdquo; often just means the robot made progress, such as moving the very object it was asked to move. <b>Changed is not doomed.</b> So Second Look rescued <span data-num="p2.seen.P3.rescue" data-f="int">16</span> runs but stopped <span data-num="p2.seen.P3.harm" data-f="int">37</span> that would have finished.</p>
+
+  <h2>What we learned</h2>
+  <ul class="learn">
+    <li>Second Look makes failures <b>visible</b>: silent failures fall from <span data-num="p2.seen.P0.SF" data-f="pct1">32.1%</span> to <span data-num="p2.seen.P3.SF" data-f="pct1">15.4%</span>, and most flags are on runs that really fail.</li>
+    <li>It does <b>not raise success</b>. The effect is a small loss, and we report it as it came out.</li>
+  </ul>
+  <nav class="nav" aria-label="Next"><a class="next" href="part1.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Part 1: the detector</a><a class="next" href="part3.html">Part 3: choosing when to retry<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></nav>
+</main>
+<script src="data/site-data.js"></script><script src="js/charts.js"></script><script src="js/rail.js"></script><script src="js/part.js"></script>
+</body>
+</html>
