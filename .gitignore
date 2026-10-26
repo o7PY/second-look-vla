@@ -9,6 +9,7 @@
 !/src/
 !/scripts/
 !/tests/
+!/.github/workflows/pages.yml
 
 # src/, scripts/, tests/: Python files only (no data, notebooks, shell scripts or fixtures)
 /src/**
