@@ -1,5 +1,5 @@
 # Publishes the website to GitHub Pages with GitHub Actions.
-# Only the website files are uploaded (index.html, part1-4.html, assets/) plus the standalone study page (web-study/index.html, published at /study/ and linked from no page);
+# Only the website files are uploaded (index.html, part1-4.html, assets/) plus two standalone pages (web-study/index.html at /study/, transcript.html at /transcript/; linked from no page);
 # the Python code and everything else in the repository are not part of the site.
 # Jekyll is not used: the site is deployed as plain files, and an empty .nojekyll is shipped as well so Jekyll can never process it.
 # One-time setup: Settings > Pages > Build and deployment > Source: "GitHub Actions".
@@ -14,6 +14,7 @@ on:
       - 'assets/**'
       - '.nojekyll'
       - 'web-study/index.html'
+      - 'transcript.html'
       - '.github/workflows/pages.yml'
   workflow_dispatch:
 
@@ -40,8 +41,16 @@ jobs:
           mkdir _site
           cp index.html part1.html part2.html part3.html part4.html _site/
           cp -r assets _site/assets
-          mkdir _site/study
-          cp web-study/index.html _site/study/index.html
+          # standalone pages (published at /study/ and /transcript/, linked from no page).
+          # A missing file only skips that page, with a warning; it can never stop the main site from deploying.
+          for pair in "web-study/index.html:study" "transcript.html:transcript"; do
+            src="${pair%%:*}"; dir="${pair##*:}"
+            if [ -f "$src" ]; then
+              mkdir -p "_site/$dir" && cp "$src" "_site/$dir/index.html"
+            else
+              echo "::warning::$src not found, /$dir/ is not published"
+            fi
+          done
           touch _site/.nojekyll
           find _site -type f | sort
 

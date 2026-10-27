@@ -20,10 +20,11 @@
 /.github/workflows/*
 !/.github/workflows/pages.yml
 
-# the standalone study page: this one file only (published at /study/, linked from nowhere)
+# the standalone pages, published at /study/ and /transcript/ and linked from nowhere (these files only)
 !/web-study/
 /web-study/*
 !/web-study/index.html
+!/transcript.html
 
 # src/, scripts/, tests/: Python files only (no data, notebooks, shell scripts or fixtures)
 /src/**
