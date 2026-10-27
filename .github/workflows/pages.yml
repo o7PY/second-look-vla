@@ -1,22 +1,16 @@
-# Publishes the website to GitHub Pages with GitHub Actions.
-# Only the website files are uploaded (index.html, part1-4.html, assets/) plus two standalone pages (web-study/index.html at /study/, transcript.html at /transcript/; linked from no page);
-# the Python code and everything else in the repository are not part of the site.
-# Jekyll is not used: the site is deployed as plain files, and an empty .nojekyll is shipped as well so Jekyll can never process it.
-# One-time setup: Settings > Pages > Build and deployment > Source: "GitHub Actions".
+# OPTIONAL and currently not used: GitHub Pages publishes this repository straight from the branch
+# (Settings > Pages > Deploy from a branch > main / root), where the pages live at their file paths
+# (/, /part1.html, /web-study/, /transcript/) and the empty .nojekyll at the root keeps Jekyll off.
+# This workflow is the alternative: it uploads only the website files (index.html, part1-4.html, assets/) plus the two
+# standalone pages (web-study/index.html at /study/, transcript/index.html at /transcript/; linked from no page).
+# It runs by hand only (Actions tab > Run workflow). To use it for real, set Settings > Pages > Source to "GitHub Actions"
+# and add a push trigger under `on:` (see the commented lines).
 name: Deploy site to GitHub Pages
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'index.html'
-      - 'part*.html'
-      - 'assets/**'
-      - '.nojekyll'
-      - 'web-study/index.html'
-      - 'transcript.html'
-      - '.github/workflows/pages.yml'
   workflow_dispatch:
+  # push:
+  #   branches: [main]
 
 permissions:
   contents: read
@@ -43,7 +37,7 @@ jobs:
           cp -r assets _site/assets
           # standalone pages (published at /study/ and /transcript/, linked from no page).
           # A missing file only skips that page, with a warning; it can never stop the main site from deploying.
-          for pair in "web-study/index.html:study" "transcript.html:transcript"; do
+          for pair in "web-study/index.html:study" "transcript/index.html:transcript"; do
             src="${pair%%:*}"; dir="${pair##*:}"
             if [ -f "$src" ]; then
               mkdir -p "_site/$dir" && cp "$src" "_site/$dir/index.html"
